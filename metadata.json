@@ -1,0 +1,6 @@
+{
+  "name": "Ya Layl Shisha Flavors — Dubai Skyline Parallax Showcase",
+  "description": "Interactive parallax scroll showcase for Ya Layl shisha molasses flavors set against a multi-layered Dubai skyline.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
