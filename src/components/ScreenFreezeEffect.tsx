@@ -6,6 +6,7 @@ interface ScreenFreezeEffectProps {
   activeIndex: number;
   mouseX: number;
   mouseY: number;
+  isMobile: boolean;
 }
 
 interface FallingSnowCrystal {
@@ -250,6 +251,7 @@ export const ScreenFreezeEffect: React.FC<ScreenFreezeEffectProps> = ({
   activeIndex,
   mouseX,
   mouseY,
+  isMobile,
 }) => {
   const freeze = clamp(env.freezeIntensity, 0, 1);
   // Both background snowfall and foreground corner freeze ramp in as the showcase emerges from the Hero Stage
@@ -260,6 +262,15 @@ export const ScreenFreezeEffect: React.FC<ScreenFreezeEffectProps> = ({
     return null;
   }
 
+  const dustParticles = isMobile
+    ? BACKGROUND_SNOW_DUST.slice(0, 10)
+    : BACKGROUND_SNOW_DUST.slice(0, 22);
+  const crystalParticles = isMobile
+    ? FALLING_SNOW_CRYSTALS.slice(0, 8)
+    : FALLING_SNOW_CRYSTALS.slice(0, 14);
+  const mx = isMobile ? 0 : mouseX;
+  const my = isMobile ? 0 : mouseY;
+
   return (
     <>
       {/* BACKGROUND LAYER (z-10, behind product jar): Silky-Smooth Falling Snowflakes Across the Screen for Ice Flavors */}
@@ -268,11 +279,13 @@ export const ScreenFreezeEffect: React.FC<ScreenFreezeEffectProps> = ({
         className="fixed inset-0 pointer-events-none select-none overflow-hidden z-10"
         style={{
           opacity: showcaseFreezeOpacity,
-          transform: `translate3d(${-mouseX * 14}px, ${-mouseY * 10}px, 0)`,
+          transform: isMobile
+            ? undefined
+            : `translate3d(${-mx * 14}px, ${-my * 10}px, 0)`,
         }}
         aria-hidden="true"
       >
-        {BACKGROUND_SNOW_DUST.map((flake) => {
+        {dustParticles.map((flake) => {
           const animClass =
             flake.variant === 'fast'
               ? 'animate-snow-fall-fast'
@@ -283,16 +296,13 @@ export const ScreenFreezeEffect: React.FC<ScreenFreezeEffectProps> = ({
           return (
             <div
               key={flake.id}
-              className={`absolute rounded-full ${animClass}`}
+              className={`absolute rounded-full will-change-transform ${animClass}`}
               style={{
                 left: `${flake.x}%`,
                 top: `${flake.y}%`,
-                width: `${flake.size}px`,
-                height: `${flake.size}px`,
-                backgroundColor: '#ffffff',
-                boxShadow: `0 0 ${flake.size * 2.2}px #ffffff, 0 0 ${
-                  flake.size * 3.8
-                }px ${env.iceTint}`,
+                width: `${flake.size * 2.1}px`,
+                height: `${flake.size * 2.1}px`,
+                background: `radial-gradient(circle, #ffffff 35%, ${env.iceTint}aa 68%, transparent 100%)`,
                 animationDelay: `-${flake.delay}s`,
               }}
             />
@@ -315,24 +325,26 @@ export const ScreenFreezeEffect: React.FC<ScreenFreezeEffectProps> = ({
         <div
           className="absolute inset-0"
           style={{
-            background: `radial-gradient(ellipse 62% 58% at 50% 46%, transparent 42%, ${env.iceTint}3d 68%, ${env.secondaryColor}66 86%, #ffffffa6 100%)`,
-            boxShadow: `inset 0 0 125px ${env.primaryColor}70, inset 0 0 60px ${env.iceTint}cc, inset 0 0 22px #ffffffdd`,
+            background: `radial-gradient(ellipse 62% 58% at 50% 46%, transparent 44%, ${env.iceTint}3a 70%, ${env.secondaryColor}5a 88%, rgba(255,255,255,0.58) 100%)`,
+            boxShadow: isMobile
+              ? `inset 0 0 42px ${env.iceTint}99`
+              : `inset 0 0 88px ${env.primaryColor}60, inset 0 0 44px ${env.iceTint}bb`,
           }}
         />
 
         {/* Layer 2: Top & Bottom Sub-Zero Cryogenic Mist Plumes */}
         <div
-          className="absolute inset-x-[-8%] top-[-4%] h-[24vh] mix-blend-screen"
+          className="absolute inset-x-[-8%] top-[-4%] h-[22vh]"
           style={{
-            opacity: 0.76,
-            background: `radial-gradient(ellipse 70% 80% at 50% 0%, #ffffff 0%, ${env.iceTint} 48%, transparent 80%)`,
+            opacity: 0.45,
+            background: `radial-gradient(ellipse 70% 80% at 50% 0%, rgba(255,255,255,0.75) 0%, ${env.iceTint}88 45%, transparent 80%)`,
           }}
         />
         <div
-          className="absolute inset-x-[-8%] bottom-[-5%] h-[22vh] mix-blend-screen"
+          className="absolute inset-x-[-8%] bottom-[-5%] h-[20vh]"
           style={{
-            opacity: 0.62,
-            background: `radial-gradient(ellipse 70% 75% at 55% 100%, #ffffff 0%, ${env.iceTint} 48%, transparent 80%)`,
+            opacity: 0.38,
+            background: `radial-gradient(ellipse 70% 75% at 55% 100%, rgba(255,255,255,0.72) 0%, ${env.iceTint}88 45%, transparent 80%)`,
           }}
         />
 
@@ -362,7 +374,9 @@ export const ScreenFreezeEffect: React.FC<ScreenFreezeEffectProps> = ({
         <div
           className="absolute top-0 left-0 will-change-transform"
           style={{
-            transform: `translate3d(${-mouseX * 6}px, ${-mouseY * 6}px, 0)`,
+            transform: isMobile
+              ? undefined
+              : `translate3d(${-mx * 6}px, ${-my * 6}px, 0)`,
           }}
         >
           <OrganicCornerFrost
@@ -377,7 +391,9 @@ export const ScreenFreezeEffect: React.FC<ScreenFreezeEffectProps> = ({
         <div
           className="absolute top-0 right-0 will-change-transform"
           style={{
-            transform: `translate3d(${-mouseX * 6}px, ${-mouseY * 6}px, 0)`,
+            transform: isMobile
+              ? undefined
+              : `translate3d(${-mx * 6}px, ${-my * 6}px, 0)`,
           }}
         >
           <OrganicCornerFrost
@@ -393,7 +409,9 @@ export const ScreenFreezeEffect: React.FC<ScreenFreezeEffectProps> = ({
         <div
           className="absolute bottom-0 right-0 will-change-transform"
           style={{
-            transform: `translate3d(${-mouseX * 6}px, ${-mouseY * 6}px, 0)`,
+            transform: isMobile
+              ? undefined
+              : `translate3d(${-mx * 6}px, ${-my * 6}px, 0)`,
           }}
         >
           <OrganicCornerFrost
@@ -406,11 +424,13 @@ export const ScreenFreezeEffect: React.FC<ScreenFreezeEffectProps> = ({
           />
         </div>
 
-        {/* Bottom-Left Rim Frost (Intensified) */}
+        {/* Bottom-Left Rim Frost */}
         <div
           className="absolute bottom-0 left-0 opacity-80 will-change-transform"
           style={{
-            transform: `translate3d(${-mouseX * 4}px, ${-mouseY * 4}px, 0)`,
+            transform: isMobile
+              ? undefined
+              : `translate3d(${-mx * 4}px, ${-my * 4}px, 0)`,
           }}
         >
           <OrganicCornerFrost
@@ -423,8 +443,8 @@ export const ScreenFreezeEffect: React.FC<ScreenFreezeEffectProps> = ({
           />
         </div>
 
-        {/* Layer 4: 20 Crystalline 6-Pointed Snowflakes Gently Falling Across the Screen */}
-        {FALLING_SNOW_CRYSTALS.map((crystal) => {
+        {/* Layer 4: Crystalline 6-Pointed Snowflakes Gently Falling Across the Screen */}
+        {crystalParticles.map((crystal) => {
           const animClass =
             crystal.speed === 'fast'
               ? 'animate-snow-fall-fast'
@@ -435,7 +455,7 @@ export const ScreenFreezeEffect: React.FC<ScreenFreezeEffectProps> = ({
           return (
             <div
               key={crystal.id}
-              className={`absolute ${animClass}`}
+              className={`absolute will-change-transform ${animClass}`}
               style={{
                 left: `${crystal.x}%`,
                 top: `${crystal.y}%`,
@@ -450,7 +470,7 @@ export const ScreenFreezeEffect: React.FC<ScreenFreezeEffectProps> = ({
                   cy="12"
                   r="9"
                   fill={env.iceTint}
-                  fillOpacity="0.38"
+                  fillOpacity="0.35"
                 />
                 {/* 6-Branch Snowflake Crystal */}
                 <g

@@ -90,7 +90,19 @@ export default function App() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', handleResize, { passive: true });
 
+    // Preload product tub images cleanly on mount to eliminate mobile mid-scroll decode hitches
+    const preloaded: HTMLImageElement[] = [];
+    const preloadTimer = window.setTimeout(() => {
+      FLAVORS.forEach((f) => {
+        const img = new Image();
+        img.src = f.image;
+        img.decode?.().catch(() => {});
+        preloaded.push(img);
+      });
+    }, 150);
+
     return () => {
+      window.clearTimeout(preloadTimer);
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleResize);
     };
@@ -139,9 +151,10 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [scrollToSection]);
 
-  // Interactive mouse parallax tracking
+  // Interactive mouse parallax tracking (disabled on mobile viewports for smooth touch scrolling)
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
+      if (window.innerWidth < 1024) return;
       const nx = (e.clientX / Math.max(window.innerWidth, 1) - 0.5) * 2;
       const ny = (e.clientY / Math.max(window.innerHeight, 1) - 0.5) * 2;
       targetMouseRef.current = { x: clamp(nx, -1, 1), y: clamp(ny, -1, 1) };
@@ -160,20 +173,19 @@ export default function App() {
       const dt = Math.min((now - lastTime) / 1000, 0.1);
       lastTime = now;
 
-      const idxAlpha = 1 - Math.exp(-dt * 7.5);
-      const logoAlpha = 1 - Math.exp(-dt * 4.2);
+      const mobileMode = window.innerWidth < 1024;
+      const idxAlpha = 1 - Math.exp(-dt * (mobileMode ? 11.5 : 8.0));
+      const logoAlpha = 1 - Math.exp(-dt * (mobileMode ? 6.2 : 4.4));
       const mouseAlpha = 1 - Math.exp(-dt * 8.0);
 
       const idxDiff = targetIndexRef.current - currentIndexRef.current;
       const targetLogoProgress = computeHeroProgress(targetIndexRef.current);
       const logoDiff = targetLogoProgress - currentLogoProgressRef.current;
-      const mxDiff = targetMouseRef.current.x - currentMouseRef.current.x;
-      const myDiff = targetMouseRef.current.y - currentMouseRef.current.y;
 
       let shouldUpdateIdx = false;
       let shouldUpdateLogo = false;
 
-      if (Math.abs(idxDiff) > 0.004) {
+      if (Math.abs(idxDiff) > 0.006) {
         currentIndexRef.current += idxDiff * idxAlpha;
         shouldUpdateIdx = true;
       } else if (currentIndexRef.current !== targetIndexRef.current) {
@@ -181,7 +193,7 @@ export default function App() {
         shouldUpdateIdx = true;
       }
 
-      if (Math.abs(logoDiff) > 0.004) {
+      if (Math.abs(logoDiff) > 0.005) {
         currentLogoProgressRef.current += logoDiff * logoAlpha;
         shouldUpdateLogo = true;
       } else if (currentLogoProgressRef.current !== targetLogoProgress) {
@@ -189,12 +201,16 @@ export default function App() {
         shouldUpdateLogo = true;
       }
 
-      if (Math.abs(mxDiff) > 0.003 || Math.abs(myDiff) > 0.003) {
-        currentMouseRef.current = {
-          x: currentMouseRef.current.x + mxDiff * mouseAlpha,
-          y: currentMouseRef.current.y + myDiff * mouseAlpha,
-        };
-        setMouseOffset({ ...currentMouseRef.current });
+      if (!mobileMode) {
+        const mxDiff = targetMouseRef.current.x - currentMouseRef.current.x;
+        const myDiff = targetMouseRef.current.y - currentMouseRef.current.y;
+        if (Math.abs(mxDiff) > 0.004 || Math.abs(myDiff) > 0.004) {
+          currentMouseRef.current = {
+            x: currentMouseRef.current.x + mxDiff * mouseAlpha,
+            y: currentMouseRef.current.y + myDiff * mouseAlpha,
+          };
+          setMouseOffset({ ...currentMouseRef.current });
+        }
       }
 
       if (shouldUpdateIdx) {
@@ -229,6 +245,7 @@ export default function App() {
         continuousIndex={Math.max(0, continuousIndex)}
         mouseX={mouseOffset.x}
         mouseY={mouseOffset.y}
+        isMobile={isMobile}
       />
 
       {/* Moving Shisha Smoke & Vapor Billows During Flavor Transitions */}
@@ -247,6 +264,7 @@ export default function App() {
         env={env}
         mouseX={mouseOffset.x}
         mouseY={mouseOffset.y}
+        isMobile={isMobile}
       />
 
       {/* Fixed 3D Orbital Flavor Jar & Unified Bilingual Copy Stage */}
@@ -267,6 +285,7 @@ export default function App() {
         activeIndex={activeIndex}
         mouseX={mouseOffset.x}
         mouseY={mouseOffset.y}
+        isMobile={isMobile}
       />
 
       {/* Slow 3D Parallax-Morphing Brand Logo, Progress Dots & Dynamic Flavor-Colored Icon Badge */}

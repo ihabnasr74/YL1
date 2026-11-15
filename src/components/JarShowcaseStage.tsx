@@ -40,7 +40,7 @@ export const JarShowcaseStage: React.FC<JarShowcaseStageProps> = ({
   return (
     <div
       className="fixed inset-0 pointer-events-none z-20 overflow-hidden"
-      style={{ perspective: '1400px' }}
+      style={isMobile ? undefined : { perspective: '1400px' }}
     >
       {/* 3D Revolving Turntable & Isometric Pedestal Stage */}
       <div
@@ -49,7 +49,7 @@ export const JarShowcaseStage: React.FC<JarShowcaseStageProps> = ({
           zIndex: 20,
           left: `${desktopStageLeft}%`,
           top: `${desktopStageTop}%`,
-          transformStyle: 'preserve-3d',
+          transformStyle: isMobile ? 'flat' : 'preserve-3d',
         }}
       >
         {/* 3D Isometric Obsidian & Neon Turntable Pedestal Under Active Jar */}
@@ -59,7 +59,9 @@ export const JarShowcaseStage: React.FC<JarShowcaseStageProps> = ({
             style={{
               border: `1.5px solid ${env.secondaryColor}`,
               opacity: showcaseFactor * 0.35,
-              boxShadow: `0 0 55px ${env.primaryColor}, inset 0 0 30px ${env.primaryColor}44`,
+              boxShadow: isMobile
+                ? 'none'
+                : `0 0 44px ${env.primaryColor}, inset 0 0 24px ${env.primaryColor}44`,
               transform: `translate3d(${-mouseX * 12}px, ${
                 -mouseY * 12 + (isMobile ? 76 : 148)
               }px, -110px) rotateX(76deg) rotateZ(${orbitalRotation}deg) scale(${
@@ -168,6 +170,7 @@ export const JarShowcaseStage: React.FC<JarShowcaseStageProps> = ({
                   src={flavor.image}
                   alt={flavor.altLabel}
                   referrerPolicy="no-referrer"
+                  decoding="async"
                   draggable={false}
                   className="relative w-full h-full object-contain"
                 />

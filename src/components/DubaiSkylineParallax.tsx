@@ -13,6 +13,7 @@ interface DubaiSkylineParallaxProps {
   continuousIndex: number;
   mouseX: number;
   mouseY: number;
+  isMobile: boolean;
 }
 
 export const DubaiSkylineParallax: React.FC<DubaiSkylineParallaxProps> = ({
@@ -20,14 +21,16 @@ export const DubaiSkylineParallax: React.FC<DubaiSkylineParallaxProps> = ({
   continuousIndex,
   mouseX,
   mouseY,
+  isMobile,
 }) => {
   // Multi-layer parallax offsets driven by continuous scroll index + subtle mouse movement
-  const bgTranslateX = env.skylinePanX - mouseX * 16;
-  const bgTranslateY = env.skylinePanY - mouseY * 10;
+  const bgTranslateX = env.skylinePanX - (isMobile ? 0 : mouseX * 16);
+  const bgTranslateY = env.skylinePanY - (isMobile ? 0 : mouseY * 10);
 
-  const foregroundMistX = (continuousIndex - 3.0) * -48 - mouseX * 36;
+  const foregroundMistX =
+    (continuousIndex - 3.0) * -42 - (isMobile ? 0 : mouseX * 32);
 
-  // 0 at opening Hero stage (pure black background with moving, color-shifting blooms),
+  // 0 at opening Hero stage (full-screen darkened multi-color fusion centered on logo & callout),
   // 1 when showcasing the flavors over the darkened, flavor-tinted Dubai City Center Skyline
   const skylineReveal = smoothstep(0.08, 0.88, env.heroProgress);
   const heroBlackOpacity = 1 - skylineReveal;
@@ -38,7 +41,7 @@ export const DubaiSkylineParallax: React.FC<DubaiSkylineParallaxProps> = ({
 
   return (
     <div
-      className="fixed inset-0 overflow-hidden pointer-events-none select-none bg-black z-0"
+      className="fixed inset-0 overflow-hidden pointer-events-none select-none bg-[#020308] z-0"
       aria-hidden="true"
     >
       {/* SHOWCASE STAGE BACKDROP: Darkened & Flavor-Reactive Dubai City Center Skyline over Water */}
@@ -50,7 +53,7 @@ export const DubaiSkylineParallax: React.FC<DubaiSkylineParallaxProps> = ({
           visibility: skylineReveal > 0.002 ? 'visible' : 'hidden',
         }}
       >
-        {/* Dynamic Darkened & Flavor-Reactive Sky/Water Color-Grade Base ("تتغير الوانها حسب النكهه المعروضه واجعلها مظلمه قليلا") */}
+        {/* Dynamic Darkened & Flavor-Reactive Sky/Water Color-Grade Base */}
         <div
           data-testid="dubai-skyline-flavor-color-grade"
           className="absolute inset-0"
@@ -76,6 +79,7 @@ export const DubaiSkylineParallax: React.FC<DubaiSkylineParallaxProps> = ({
             src={DUBAI_CITY_CENTER_SKYLINE}
             alt="Dubai City Center Skyline"
             referrerPolicy="no-referrer"
+            decoding="async"
             className="w-full h-full object-cover object-center opacity-48"
           />
         </div>
@@ -83,29 +87,28 @@ export const DubaiSkylineParallax: React.FC<DubaiSkylineParallaxProps> = ({
         {/* Subtle Radial Aura & Shisha Vapor Halo Behind Active Flavor Jar */}
         <div
           data-testid="shisha-smoke-stage-layer"
-          className="absolute left-[50%] lg:left-[67.5%] top-[46%] lg:top-[55.5%] -translate-x-1/2 -translate-y-1/2 w-[54vw] max-w-[680px] aspect-square rounded-full opacity-75 will-change-transform"
+          className="absolute left-[50%] lg:left-[67.5%] top-[40%] lg:top-[55.5%] -translate-x-1/2 -translate-y-1/2 w-[78vw] lg:w-[54vw] max-w-[660px] aspect-square rounded-full opacity-72 will-change-transform"
           style={{
-            background: `radial-gradient(circle, rgba(255, 255, 255, 0.24) 0%, ${withAlpha(env.primaryColor, 0.58)} 26%, ${withAlpha(env.ambientGlow, 0.34)} 52%, transparent 72%)`,
-            transform: `translate3d(${-mouseX * 20}px, ${-mouseY * 20}px, 0) scale(${
-              1 + Math.sin(continuousIndex * Math.PI) * 0.1
-            })`,
+            background: `radial-gradient(circle, rgba(255, 255, 255, 0.22) 0%, ${withAlpha(env.primaryColor, 0.56)} 26%, ${withAlpha(env.ambientGlow, 0.32)} 52%, transparent 72%)`,
+            transform: isMobile
+              ? undefined
+              : `translate3d(${-mouseX * 18}px, ${-mouseY * 18}px, 0)`,
           }}
         />
 
         {/* Drifting Parallax Vapor Plumes Over the Water Reflection */}
         <div
-          className="absolute inset-x-[-20%] bottom-[4%] h-[36vh] opacity-55 will-change-transform"
+          className="absolute inset-x-[-20%] bottom-[4%] h-[34vh] opacity-50 will-change-transform"
           style={{
-            transform: `translate3d(${foregroundMistX.toFixed(1)}px, ${(-mouseY * 14).toFixed(1)}px, 0)`,
-            background: `radial-gradient(ellipse 35% 40% at 34% 60%, rgba(255, 255, 255, 0.16) 0%, ${withAlpha(env.secondaryColor, 0.45)} 35%, transparent 70%),
-                         radial-gradient(ellipse 40% 45% at 66% 55%, rgba(255, 255, 255, 0.18) 0%, ${withAlpha(env.primaryColor, 0.45)} 35%, transparent 70%)`,
+            transform: `translate3d(${foregroundMistX.toFixed(1)}px, 0, 0)`,
+            background: `radial-gradient(ellipse 35% 40% at 34% 60%, rgba(255, 255, 255, 0.14) 0%, ${withAlpha(env.secondaryColor, 0.42)} 35%, transparent 70%),
+                         radial-gradient(ellipse 40% 45% at 66% 55%, rgba(255, 255, 255, 0.16) 0%, ${withAlpha(env.primaryColor, 0.42)} 35%, transparent 70%)`,
           }}
         />
 
-        {/* FLAVOR-COLORED TRANSLUCENT FOCUS BOX WITH SMOOTH FLOWING GLOWING OUTLINE
+        {/* FLAVOR-COLORED TRANSLUCENT FOCUS BOX WITH GPU-COMPOSITED SMOOTH FLOWING OUTLINE
             - Dynamically transforms to the active flavor's color while remaining transparent
-            - Features a smooth, continuous glowing outline traveling around the perimeter in the flavor's color
-            - Positioned behind the moving flavor particles (z-15) and behind the product tub & text (z-20) */}
+            - Uses GPU-composited rotating conic-gradient mask so mobile phones maintain 60fps */}
         {focusBoxOpacity > 0.01 && (
           <div
             data-testid="showcase-focus-backdrop"
@@ -118,185 +121,139 @@ export const DubaiSkylineParallax: React.FC<DubaiSkylineParallaxProps> = ({
             style={{
               opacity: focusBoxOpacity,
               background: `
-                radial-gradient(ellipse 85% 75% at 65% 50%, ${withAlpha(env.primaryColor, 0.24)} 0%, transparent 72%),
+                radial-gradient(ellipse 85% 75% at 65% 50%, ${withAlpha(env.primaryColor, 0.22)} 0%, transparent 72%),
                 linear-gradient(135deg,
-                  ${withAlpha(env.primaryColor, 0.28)} 0%,
-                  ${withAlpha(env.ambientGlow, 0.36)} 50%,
-                  ${withAlpha(env.secondaryColor, 0.24)} 100%
+                  ${withAlpha(env.primaryColor, 0.26)} 0%,
+                  ${withAlpha(env.ambientGlow, 0.34)} 50%,
+                  ${withAlpha(env.secondaryColor, 0.22)} 100%
                 ),
                 rgba(3, 5, 14, 0.44)
               `,
-              boxShadow: `0 24px 64px rgba(0, 0, 0, 0.46), 0 0 55px ${withAlpha(env.primaryColor, 0.28)}, inset 0 0 42px ${withAlpha(env.primaryColor, 0.18)}`,
-              transform: `translate3d(${mouseX * -6}px, ${mouseY * -5}px, 0)`,
+              boxShadow: isMobile
+                ? `0 14px 34px rgba(0, 0, 0, 0.48), 0 0 28px ${withAlpha(env.primaryColor, 0.22)}`
+                : `0 24px 64px rgba(0, 0, 0, 0.46), 0 0 52px ${withAlpha(env.primaryColor, 0.26)}, inset 0 0 38px ${withAlpha(env.primaryColor, 0.16)}`,
+              transform: isMobile
+                ? undefined
+                : `translate3d(${mouseX * -6}px, ${mouseY * -5}px, 0)`,
             }}
           >
-            {/* Continuous Smoothly Flowing Luminous Outline Around the Box Perimeter */}
-            <svg
+            {/* Base Subtle Perimeter Border Track */}
+            <div
+              className="absolute inset-0 rounded-[34px] lg:rounded-[38px] pointer-events-none"
+              style={{
+                border: `1.5px solid ${withAlpha(env.primaryColor, 0.38)}`,
+              }}
+            />
+
+            {/* Smooth Clockwise Flowing Luminous Outline Around the Rounded Box Perimeter (Ultra-Lightweight) */}
+            <div
               data-testid="showcase-focus-outline-svg"
-              className="absolute inset-0 w-full h-full overflow-visible pointer-events-none"
+              className="absolute inset-0 rounded-[34px] lg:rounded-[38px] overflow-hidden pointer-events-none"
             >
-              {/* Base Subtle Perimeter Track in Flavor Color */}
-              <rect
-                x="1"
-                y="1"
-                width="calc(100% - 2px)"
-                height="calc(100% - 2px)"
-                rx="36"
-                ry="36"
-                fill="none"
-                stroke={env.primaryColor}
-                strokeOpacity="0.38"
-                strokeWidth="1.5"
-              />
+              {/* Top Edge Luminous Beam */}
+              <div className="absolute top-0 inset-x-0 h-[2.5px] overflow-hidden">
+                <div
+                  className="h-full w-[42%] rounded-full animate-beam-top will-change-transform"
+                  style={{
+                    background: `linear-gradient(90deg, transparent 0%, ${env.primaryColor} 30%, ${env.secondaryColor} 65%, #ffffff 85%, ${env.secondaryColor} 95%, transparent 100%)`,
+                  }}
+                />
+              </div>
 
-              {/* Outer Soft Luminous Halo Stream Flowing Around the Box */}
-              <rect
-                x="1"
-                y="1"
-                width="calc(100% - 2px)"
-                height="calc(100% - 2px)"
-                rx="36"
-                ry="36"
-                pathLength="1000"
-                fill="none"
-                stroke={env.primaryColor}
-                strokeOpacity="0.52"
-                strokeWidth="8"
-                strokeLinecap="round"
-                strokeDasharray="240 260 240 260"
-                className="animate-border-flow"
-              />
+              {/* Right Edge Luminous Beam */}
+              <div className="absolute right-0 inset-y-0 w-[2.5px] overflow-hidden">
+                <div
+                  className="w-full h-[42%] rounded-full animate-beam-right will-change-transform"
+                  style={{
+                    background: `linear-gradient(180deg, transparent 0%, ${env.primaryColor} 30%, ${env.secondaryColor} 65%, #ffffff 85%, ${env.secondaryColor} 95%, transparent 100%)`,
+                  }}
+                />
+              </div>
 
-              {/* Mid Vibrant Flavor-Colored Stream Flowing Around the Box */}
-              <rect
-                x="1"
-                y="1"
-                width="calc(100% - 2px)"
-                height="calc(100% - 2px)"
-                rx="36"
-                ry="36"
-                pathLength="1000"
-                fill="none"
-                stroke={env.secondaryColor}
-                strokeOpacity="0.96"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeDasharray="220 280 220 280"
-                className="animate-border-flow"
-              />
+              {/* Bottom Edge Luminous Beam */}
+              <div className="absolute bottom-0 inset-x-0 h-[2.5px] overflow-hidden">
+                <div
+                  className="h-full w-[42%] rounded-full animate-beam-bottom will-change-transform"
+                  style={{
+                    background: `linear-gradient(270deg, transparent 0%, ${env.primaryColor} 30%, ${env.secondaryColor} 65%, #ffffff 85%, ${env.secondaryColor} 95%, transparent 100%)`,
+                  }}
+                />
+              </div>
 
-              {/* Bright Leading Energy Core Flowing Smoothly Around the Box */}
-              <rect
-                x="1"
-                y="1"
-                width="calc(100% - 2px)"
-                height="calc(100% - 2px)"
-                rx="36"
-                ry="36"
-                pathLength="1000"
-                fill="none"
-                stroke="#ffffff"
-                strokeOpacity="0.92"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeDasharray="70 430 70 430"
-                className="animate-border-flow"
-              />
-            </svg>
+              {/* Left Edge Luminous Beam */}
+              <div className="absolute left-0 inset-y-0 w-[2.5px] overflow-hidden">
+                <div
+                  className="w-full h-[42%] rounded-full animate-beam-left will-change-transform"
+                  style={{
+                    background: `linear-gradient(0deg, transparent 0%, ${env.primaryColor} 30%, ${env.secondaryColor} 65%, #ffffff 85%, ${env.secondaryColor} 95%, transparent 100%)`,
+                  }}
+                />
+              </div>
+            </div>
           </div>
         )}
       </div>
 
       {/* OPENING HERO STAGE BACKDROP:
-          Pitch-Black Background (#000000) with Animated, Color-Shifting & Moving Saturated Blooms
-          Positioned EXACTLY Behind the Full Width of the Ya Layl Logo and Behind "اكتشف نكهات يالليل" */}
+          Full-Viewport Darkened Color Fusion ("الخلفية كاملة ألوان بنفس الشكل ولكن داكنة قليلاً إلى الأسود")
+          with brighter luminous focus centered behind the Ya Layl Logo & "اكتشف نكهات يالليل" */}
       {heroBlackOpacity > 0.005 && (
         <div
           data-testid="hero-ghostly-black-backdrop"
-          className="absolute inset-0 bg-black overflow-hidden"
+          className="absolute inset-0 bg-[#020307] overflow-hidden"
           style={{
             opacity: heroBlackOpacity,
           }}
         >
-          {/* 1. Full-Width Animated Moving & Color-Shifting Auras Directly Behind the Enlarged Ya Layl Logo (top ~ 33%) */}
+          {/* Full-Screen Darkened Multi-Color Fusion Canvas (same fused palette darkened seamlessly toward black) */}
+          <div
+            data-testid="hero-full-color-fusion-bg"
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: `
+                radial-gradient(ellipse 68% 58% at 22% 24%, rgba(255, 10, 84, 0.24) 0%, rgba(168, 85, 247, 0.14) 44%, transparent 78%),
+                radial-gradient(ellipse 68% 58% at 78% 26%, rgba(0, 229, 255, 0.22) 0%, rgba(16, 185, 129, 0.12) 44%, transparent 78%),
+                radial-gradient(ellipse 62% 52% at 24% 78%, rgba(168, 85, 247, 0.20) 0%, rgba(255, 10, 84, 0.10) 46%, transparent 78%),
+                radial-gradient(ellipse 62% 52% at 76% 78%, rgba(16, 185, 129, 0.18) 0%, rgba(0, 229, 255, 0.10) 46%, transparent 78%),
+                radial-gradient(ellipse 80% 65% at 50% 50%, rgba(245, 158, 11, 0.12) 0%, rgba(168, 85, 247, 0.10) 48%, rgba(2, 3, 7, 0.88) 100%)
+              `,
+            }}
+          />
+
+          {/* Subtle Moving Drifting Fused Color Layer A (Transform-Only for 60fps Mobile Smoothness) */}
           <div
             data-testid="hero-logo-color-aura"
-            className="absolute left-1/2 top-[33%] -translate-x-1/2 -translate-y-1/2 w-[98vw] max-w-[1280px] h-[660px] pointer-events-none"
+            className="absolute inset-[-6%] pointer-events-none animate-hero-orb-a will-change-transform"
             style={{
-              transform: `translate3d(${-mouseX * 22}px, ${-mouseY * 16}px, 0)`,
+              background: `
+                radial-gradient(ellipse 36% 26% at 36% 35%, rgba(255, 10, 84, 0.52) 0%, rgba(168, 85, 247, 0.24) 38%, transparent 72%),
+                radial-gradient(ellipse 30% 24% at 56% 33%, rgba(245, 158, 11, 0.34) 0%, transparent 68%),
+                radial-gradient(ellipse 30% 18% at 44% 66%, rgba(255, 10, 84, 0.48) 0%, rgba(168, 85, 247, 0.20) 40%, transparent 72%)
+              `,
             }}
-          >
-            {/* Wave A Behind Logo: Drifting Crimson-Magenta & Amber Glow */}
-            <div
-              className="absolute inset-0 animate-hero-orb-a"
-              style={{
-                background: `
-                  radial-gradient(ellipse 36% 42% at 34% 50%, rgba(255, 10, 84, 0.78) 0%, rgba(168, 85, 247, 0.42) 28%, rgba(168, 85, 247, 0.14) 52%, rgba(168, 85, 247, 0.03) 72%, transparent 88%),
-                  radial-gradient(ellipse 32% 38% at 54% 48%, rgba(245, 158, 11, 0.46) 0%, rgba(245, 158, 11, 0.18) 34%, rgba(245, 158, 11, 0.04) 60%, transparent 82%)
-                `,
-              }}
-            />
+          />
 
-            {/* Wave B Behind Logo: Counter-Drifting Electric Cyan & Emerald Glow */}
-            <div
-              className="absolute inset-0 animate-hero-orb-b"
-              style={{
-                background: `
-                  radial-gradient(ellipse 36% 42% at 66% 50%, rgba(0, 229, 255, 0.74) 0%, rgba(16, 185, 129, 0.38) 28%, rgba(16, 185, 129, 0.12) 52%, rgba(16, 185, 129, 0.03) 72%, transparent 88%),
-                  radial-gradient(ellipse 36% 40% at 46% 52%, rgba(168, 85, 247, 0.60) 0%, rgba(168, 85, 247, 0.24) 32%, rgba(168, 85, 247, 0.06) 58%, transparent 82%)
-                `,
-              }}
-            />
-
-            {/* Wave C Behind Logo: Pulsing Center Core Behind "YA LAYL" */}
-            <div
-              className="absolute inset-0 animate-hero-orb-c"
-              style={{
-                background: `
-                  radial-gradient(ellipse 42% 40% at 50% 50%, rgba(236, 72, 153, 0.56) 0%, rgba(56, 189, 248, 0.28) 30%, rgba(56, 189, 248, 0.08) 56%, transparent 84%)
-                `,
-              }}
-            />
-          </div>
-
-          {/* 2. Animated Moving & Color-Shifting Auras Directly Behind "اكتشف نكهات يالليل / DISCOVER YA LAYL FLAVORS" (top ~ 67%) */}
+          {/* Subtle Counter-Drifting Fused Color Layer B Focusing on Logo & Callout */}
           <div
             data-testid="hero-callout-color-aura"
-            className="absolute left-1/2 top-[63%] sm:top-[66%] lg:top-[68%] -translate-x-1/2 -translate-y-1/2 w-[94vw] max-w-[980px] h-[460px] pointer-events-none"
+            className="absolute inset-[-6%] pointer-events-none animate-hero-orb-b will-change-transform"
             style={{
-              transform: `translate3d(${mouseX * 18}px, ${mouseY * 14}px, 0)`,
+              background: `
+                radial-gradient(ellipse 36% 26% at 64% 35%, rgba(0, 229, 255, 0.50) 0%, rgba(16, 185, 129, 0.22) 38%, transparent 72%),
+                radial-gradient(ellipse 32% 24% at 48% 36%, rgba(168, 85, 247, 0.42) 0%, transparent 68%),
+                radial-gradient(ellipse 30% 18% at 56% 66%, rgba(0, 229, 255, 0.46) 0%, rgba(245, 158, 11, 0.20) 40%, transparent 72%)
+              `,
             }}
-          >
-            {/* Wave A Behind Callout: Drifting Crimson-Violet Glow */}
-            <div
-              className="absolute inset-0 animate-hero-orb-b"
-              style={{
-                background: `
-                  radial-gradient(ellipse 36% 40% at 40% 50%, rgba(255, 10, 84, 0.76) 0%, rgba(168, 85, 247, 0.38) 28%, rgba(168, 85, 247, 0.12) 52%, rgba(168, 85, 247, 0.02) 72%, transparent 88%)
-                `,
-              }}
-            />
+          />
 
-            {/* Wave B Behind Callout: Counter-Drifting Cyan-Emerald Glow */}
-            <div
-              className="absolute inset-0 animate-hero-orb-a"
-              style={{
-                background: `
-                  radial-gradient(ellipse 36% 40% at 60% 50%, rgba(0, 229, 255, 0.74) 0%, rgba(16, 185, 129, 0.36) 28%, rgba(16, 185, 129, 0.12) 52%, rgba(16, 185, 129, 0.02) 72%, transparent 88%)
-                `,
-              }}
-            />
-
-            {/* Wave C Behind Callout: Pulsing Golden-Rose Center Core */}
-            <div
-              className="absolute inset-0 animate-hero-orb-c"
-              style={{
-                background: `
-                  radial-gradient(ellipse 40% 40% at 50% 50%, rgba(245, 158, 11, 0.58) 0%, rgba(255, 10, 84, 0.28) 30%, rgba(255, 10, 84, 0.08) 56%, transparent 84%)
-                `,
-              }}
-            />
-          </div>
+          {/* Outer Edge Darkening Vignette to Keep Focus Tightly on Center Logo & "اكتشف نكهات يالليل" */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                'radial-gradient(ellipse 68% 62% at 50% 48%, transparent 25%, rgba(2, 3, 8, 0.58) 72%, rgba(0, 0, 0, 0.86) 100%)',
+            }}
+          />
         </div>
       )}
     </div>

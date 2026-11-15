@@ -8,6 +8,7 @@ interface FlavorParticlesProps {
   env: InterpolatedEnvironment;
   mouseX: number;
   mouseY: number;
+  isMobile: boolean;
 }
 
 interface IngredientSpec {
@@ -22,7 +23,7 @@ interface IngredientSpec {
   spinFactor: number;
 }
 
-// Expanded 16-element multi-depth 3D halo framing the active product tub
+// Balanced 12-element multi-depth 3D halo framing the active product tub (8 on mobile for 60fps)
 const INGREDIENT_ORBIT: IngredientSpec[] = [
   // Inner-mid ring directly framing the jar
   { id: 1, angleDeg: -135, radiusX: 225, radiusY: 165, size: 92, depthFactor: 1.35, variant: 'primary', baseRotate: -16, spinFactor: 95 },
@@ -446,10 +447,17 @@ export const FlavorParticles: React.FC<FlavorParticlesProps> = ({
   env,
   mouseX,
   mouseY,
+  isMobile,
 }) => {
   if (env.heroProgress <= 0.05) return null;
 
   const activePulse = Math.max(0, continuousIndex) * 90;
+  const orbitItems = isMobile
+    ? INGREDIENT_ORBIT.slice(0, 8)
+    : INGREDIENT_ORBIT.slice(0, 12);
+  const cullThreshold = isMobile ? 0.78 : 0.92;
+  const mx = isMobile ? 0 : mouseX;
+  const my = isMobile ? 0 : mouseY;
 
   return (
     <div
@@ -460,12 +468,12 @@ export const FlavorParticles: React.FC<FlavorParticlesProps> = ({
       {flavors.map((flavor, flavorIdx) => {
         const delta = flavorIdx - Math.max(0, continuousIndex);
         const absDelta = Math.abs(delta);
-        if (absDelta > 0.94) return null;
+        if (absDelta > cullThreshold) return null;
 
         const clusterOpacity =
-          clamp(1 - Math.pow(absDelta / 0.88, 1.4), 0, 1) * env.heroProgress;
-        const radialBurst = 1 + absDelta * 0.48 + (1 - env.heroProgress) * 0.3;
-        const verticalDrift = delta * 240;
+          clamp(1 - Math.pow(absDelta / 0.85, 1.4), 0, 1) * env.heroProgress;
+        const radialBurst = 1 + absDelta * 0.45 + (1 - env.heroProgress) * 0.3;
+        const verticalDrift = delta * 220;
 
         return (
           <div
@@ -479,8 +487,10 @@ export const FlavorParticles: React.FC<FlavorParticlesProps> = ({
             <div
               className="absolute w-[280px] h-[280px] sm:w-[390px] sm:h-[390px] lg:w-[540px] lg:h-[540px] rounded-full"
               style={{
-                background: `radial-gradient(circle, ${flavor.primaryColor}60 0%, ${flavor.secondaryColor}30 48%, transparent 72%)`,
-                transform: `translate3d(${-mouseX * 24}px, ${-mouseY * 18}px, 0)`,
+                background: `radial-gradient(circle, ${flavor.primaryColor}58 0%, ${flavor.secondaryColor}2c 48%, transparent 72%)`,
+                transform: isMobile
+                  ? undefined
+                  : `translate3d(${-mx * 24}px, ${-my * 18}px, 0)`,
               }}
             />
 
@@ -489,26 +499,28 @@ export const FlavorParticles: React.FC<FlavorParticlesProps> = ({
               className="absolute w-[250px] h-[250px] sm:w-[340px] sm:h-[340px] lg:w-[460px] lg:h-[460px] rounded-full"
               style={{
                 border: `1.5px dashed ${flavor.secondaryColor}88`,
-                boxShadow: `0 0 32px ${flavor.primaryColor}55, inset 0 0 24px ${flavor.primaryColor}33`,
-                transform: `translate3d(${-mouseX * 18}px, ${-mouseY * 14}px, 0) rotate(${
+                boxShadow: isMobile
+                  ? 'none'
+                  : `0 0 28px ${flavor.primaryColor}48, inset 0 0 20px ${flavor.primaryColor}28`,
+                transform: `translate3d(${-mx * 18}px, ${-my * 14}px, 0) rotate(${
                   activePulse + flavorIdx * 45
                 }deg)`,
               }}
             />
 
-            {/* 16 Multi-Depth Floating & Spinning Ingredients */}
-            {INGREDIENT_ORBIT.map((spec) => {
+            {/* Multi-Depth Floating & Spinning Ingredients */}
+            {orbitItems.map((spec) => {
               const rad = (spec.angleDeg * Math.PI) / 180;
               const spiralAngle =
                 rad + delta * 0.65 * (spec.id % 2 === 0 ? 1 : -1);
 
               const x =
                 Math.cos(spiralAngle) * spec.radiusX * radialBurst -
-                mouseX * 42 * spec.depthFactor;
+                mx * 42 * spec.depthFactor;
               const y =
                 Math.sin(spiralAngle) * spec.radiusY * radialBurst +
                 verticalDrift * spec.depthFactor -
-                mouseY * 32 * spec.depthFactor;
+                my * 32 * spec.depthFactor;
 
               const depthScale = clamp(
                 0.72 + (spec.depthFactor - 0.75) * 0.45 - absDelta * 0.18,

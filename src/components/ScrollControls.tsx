@@ -246,9 +246,6 @@ export const ScrollControls: React.FC<ScrollControlsProps> = ({
           referrerPolicy="no-referrer"
           draggable={false}
           className="relative w-[255px] sm:w-[490px] lg:w-[680px] h-auto object-contain select-none transition-transform duration-300 group-hover:scale-[1.03]"
-          style={{
-            filter: 'drop-shadow(0 4px 14px rgba(0,0,0,0.92))',
-          }}
         />
       </button>
 
@@ -333,10 +330,10 @@ export const ScrollControls: React.FC<ScrollControlsProps> = ({
             data-testid="hero-scroll-down-btn"
             aria-label="Scroll to first flavor"
             onClick={() => onSelectFlavor(0)}
-            className="pointer-events-auto mt-4 sm:mt-6 w-12 h-12 rounded-2xl rotate-45 flex items-center justify-center bg-black/85 backdrop-blur-md text-white border border-white/30 hover:scale-110 transition-transform duration-300 cursor-pointer"
+            className="pointer-events-auto mt-4 sm:mt-6 w-12 h-12 rounded-2xl rotate-45 flex items-center justify-center bg-black/90 text-white border border-white/30 hover:scale-110 transition-transform duration-300 cursor-pointer"
             style={{
               boxShadow:
-                '0 0 28px rgba(255, 10, 84, 0.65), 0 0 44px rgba(0, 229, 255, 0.45)',
+                '0 0 24px rgba(255, 10, 84, 0.55), 0 0 36px rgba(0, 229, 255, 0.40)',
             }}
           >
             <ChevronDown className="w-5 h-5 -rotate-45 animate-bounce" />
@@ -347,7 +344,7 @@ export const ScrollControls: React.FC<ScrollControlsProps> = ({
       {/* Redesigned Right-Side Architectural Timeline Track */}
       <nav
         aria-label="Flavors navigation"
-        className="fixed right-2.5 sm:right-6 top-[35%] lg:top-1/2 -translate-y-1/2 z-30 flex flex-col items-center py-2.5 px-1 rounded-full bg-slate-950/35 backdrop-blur-md border border-white/10 gap-1 sm:gap-1.5"
+        className="fixed right-2.5 sm:right-6 top-[35%] lg:top-1/2 -translate-y-1/2 z-30 flex flex-col items-center py-2.5 px-1 rounded-full bg-slate-950/75 border border-white/10 gap-1 sm:gap-1.5"
       >
         {/* Hero Intro Indicator */}
         <button
@@ -384,7 +381,7 @@ export const ScrollControls: React.FC<ScrollControlsProps> = ({
             >
               {/* Hover Miniature Jar Preview */}
               <span
-                className="pointer-events-none absolute right-9 w-12 h-12 rounded-xl p-1.5 bg-slate-950/90 backdrop-blur-md border border-white/15 opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 group-focus-visible:opacity-100 group-focus-visible:scale-100 transition-all duration-200 shadow-xl"
+                className="pointer-events-none absolute right-9 w-12 h-12 rounded-xl p-1.5 bg-slate-950/95 border border-white/15 opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 group-focus-visible:opacity-100 group-focus-visible:scale-100 transition-all duration-200 shadow-xl"
                 aria-hidden="true"
               >
                 <img
@@ -434,10 +431,10 @@ export const ScrollControls: React.FC<ScrollControlsProps> = ({
               onScrollToHero();
             }
           }}
-          className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center bg-slate-950/85 backdrop-blur-xl text-white hover:scale-105 disabled:opacity-30 disabled:pointer-events-none transition-all duration-200 cursor-pointer shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center bg-slate-950/92 text-white hover:scale-105 disabled:opacity-30 disabled:pointer-events-none transition-all duration-200 cursor-pointer shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
           style={{
             border: `1.5px solid ${activeFlavor.primaryColor}88`,
-            boxShadow: `0 0 18px ${activeFlavor.primaryColor}44`,
+            boxShadow: `0 0 14px ${activeFlavor.primaryColor}38`,
           }}
         >
           <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -449,11 +446,11 @@ export const ScrollControls: React.FC<ScrollControlsProps> = ({
           data-testid="bottom-flavor-badge"
           aria-label={`Current flavor: ${activeFlavor.nameAr} - ${activeFlavor.nameEn}`}
           onClick={() => onSelectFlavor((activeIndex + 1) % flavors.length)}
-          className="group relative flex items-center gap-2.5 sm:gap-4 pl-2 pr-3.5 sm:pl-2.5 sm:pr-6 py-1.5 sm:py-2 rounded-2xl backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer min-w-0 overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          className="group relative flex items-center gap-2 sm:gap-4 pl-1.5 pr-2.5 sm:pl-2.5 sm:pr-6 py-1.5 sm:py-2 rounded-2xl transition-all duration-300 hover:scale-[1.02] cursor-pointer min-w-0 overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
           style={{
-            background: `linear-gradient(135deg, rgba(2, 6, 23, 0.92) 0%, ${activeFlavor.primaryColor}38 55%, rgba(2, 6, 23, 0.94) 100%)`,
+            background: `linear-gradient(135deg, rgba(2, 6, 23, 0.94) 0%, ${activeFlavor.primaryColor}38 55%, rgba(2, 6, 23, 0.96) 100%)`,
             border: `1.5px solid ${activeFlavor.primaryColor}`,
-            boxShadow: `0 10px 34px rgba(0,0,0,0.82), 0 0 28px ${activeFlavor.primaryColor}66, inset 0 1px 0 ${activeFlavor.secondaryColor}66`,
+            boxShadow: `0 10px 30px rgba(0,0,0,0.82), 0 0 22px ${activeFlavor.primaryColor}55, inset 0 1px 0 ${activeFlavor.secondaryColor}55`,
           }}
         >
           {/* Flavor-Specific Shape Inside Circle */}
@@ -461,10 +458,10 @@ export const ScrollControls: React.FC<ScrollControlsProps> = ({
             key={activeFlavor.motif}
             data-testid="bottom-flavor-icon"
             data-flavor-motif={activeFlavor.motif}
-            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 group-hover:rotate-12"
+            className="w-7 h-7 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 group-hover:rotate-12"
             style={{
               background: `radial-gradient(circle at 30% 30%, ${activeFlavor.secondaryColor}66 0%, ${activeFlavor.primaryColor} 55%, ${activeFlavor.ambientGlow} 100%)`,
-              boxShadow: `0 0 18px ${activeFlavor.primaryColor}, inset 0 0 8px #ffffff66`,
+              boxShadow: `0 0 16px ${activeFlavor.primaryColor}, inset 0 0 8px #ffffff66`,
               border: `1.5px solid ${activeFlavor.secondaryColor}`,
             }}
           >
@@ -472,10 +469,10 @@ export const ScrollControls: React.FC<ScrollControlsProps> = ({
           </span>
 
           {/* Bilingual Flavor Name (Arabic & English) */}
-          <span className="flex items-center gap-2 sm:gap-3 whitespace-nowrap overflow-hidden">
+          <span className="flex items-center gap-1.5 sm:gap-3 whitespace-nowrap overflow-hidden min-w-0">
             <span
               dir="rtl"
-              className="text-[13px] sm:text-base md:text-lg font-extrabold text-white tracking-normal"
+              className="text-[12px] sm:text-base md:text-lg font-extrabold text-white tracking-normal shrink-0"
               style={{
                 fontFamily: "'Cairo', sans-serif",
                 textShadow: `0 0 14px ${activeFlavor.primaryColor}`,
@@ -494,7 +491,7 @@ export const ScrollControls: React.FC<ScrollControlsProps> = ({
             />
 
             <span
-              className="text-[11px] sm:text-sm md:text-base font-bold text-white/95 tracking-wider"
+              className="text-[10px] sm:text-sm md:text-base font-bold text-white/95 tracking-wide sm:tracking-wider truncate"
               style={{
                 fontFamily: "'Cinzel', serif",
                 textShadow: `0 0 14px ${activeFlavor.primaryColor}`,
@@ -517,10 +514,10 @@ export const ScrollControls: React.FC<ScrollControlsProps> = ({
               onSelectFlavor(activeIndex + 1);
             }
           }}
-          className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center bg-slate-950/85 backdrop-blur-xl text-white hover:scale-105 disabled:opacity-30 disabled:pointer-events-none transition-all duration-200 cursor-pointer shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center bg-slate-950/92 text-white hover:scale-105 disabled:opacity-30 disabled:pointer-events-none transition-all duration-200 cursor-pointer shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
           style={{
             border: `1.5px solid ${activeFlavor.primaryColor}88`,
-            boxShadow: `0 0 18px ${activeFlavor.primaryColor}44`,
+            boxShadow: `0 0 14px ${activeFlavor.primaryColor}38`,
           }}
         >
           <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
